@@ -36,6 +36,7 @@ app.UseHttpsRedirection();
 
 app.MapUniversityEndpoints();
 app.MapDepartmentEndpoints();
+app.MapProfessorEndpoints();
 
 // ##########################################################
 // ##########################################################
