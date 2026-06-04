@@ -1,8 +1,8 @@
 # University Manager API
 
-University Manager API is a RESTful web service built with ASP.NET Core, Entity Framework Core, and SQL Server for managing academic institutions, departments, courses, professors, students, and teaching assignments.
+University Manager API is a RESTful web service built with ASP.NET 10, Entity Framework Core, SQL Server, and Mapster for managing universities, departments, courses, professors, students, enrollments, and teaching assignments.
 
-The project follows a clean and pragmatic architecture using Fluent API configurations, DTO-based contracts, Minimal APIs, and Mapster object mapping.
+The project follows a clean architecture based on Minimal APIs, Fluent API entity configuration, DTO contracts, and a Code First database approach using Entity Framework Core.
 
 ---
 
@@ -13,11 +13,13 @@ The project follows a clean and pragmatic architecture using Fluent API configur
 - Course management
 - Professor management
 - Student management
-- Professor-course assignments
+- Student enrollment management
+- Grade tracking
+- Professor-course assignment management
 - Entity Framework Core Code First approach
 - Database migrations
-- DTO-based API contracts
 - Fluent API entity configuration
+- DTO-based API contracts
 - Minimal API endpoints
 - Object mapping with Mapster
 
@@ -25,12 +27,26 @@ The project follows a clean and pragmatic architecture using Fluent API configur
 
 ## Technology Stack
 
-- .NET 8
+- .NET 10
 - ASP.NET Core Minimal APIs
 - Entity Framework Core
 - SQL Server
 - Mapster
 - C#
+
+---
+
+## Architecture
+
+The application is organized around a domain-driven structure that separates:
+
+- Domain entities
+- Data access
+- Entity configurations
+- API contracts (DTOs)
+- Endpoint definitions
+
+This approach keeps the codebase maintainable, scalable, and easy to extend.
 
 ---
 
@@ -40,6 +56,7 @@ The project follows a clean and pragmatic architecture using Fluent API configur
 Configurations/
 ├── CourseConfiguration.cs
 ├── DepartmentConfiguration.cs
+├── EnrollmentConfiguration.cs
 ├── ProfessorConfiguration.cs
 ├── ProfessorCourseConfiguration.cs
 ├── StudentConfiguration.cs
@@ -48,6 +65,7 @@ Configurations/
 DTOs/
 ├── Course/
 ├── Department/
+├── Enrollment/
 ├── Professor/
 ├── ProfessorCourse/
 ├── Student/
@@ -59,6 +77,7 @@ Data/
 Endpoints/
 ├── CourseEndpoints.cs
 ├── DepartmentEndpoints.cs
+├── EnrollmentEndpoints.cs
 ├── ProfessorEndpoints.cs
 ├── ProfessorCourseEndpoints.cs
 ├── StudentEndpoints.cs
@@ -67,6 +86,7 @@ Endpoints/
 Entities/
 ├── Course.cs
 ├── Department.cs
+├── Enrollment.cs
 ├── Professor.cs
 ├── ProfessorCourse.cs
 ├── Student.cs
@@ -76,6 +96,8 @@ Migrations/
 └── Entity Framework Core migrations
 
 Program.cs
+appsettings.json
+appsettings.Development.json
 ```
 
 ---
@@ -84,16 +106,18 @@ Program.cs
 
 ### University
 
-A university contains multiple departments.
+Represents an academic institution.
 
 ```text
 University
     └── Departments
 ```
 
+---
+
 ### Department
 
-A department belongs to a university and contains multiple courses and professors.
+Represents an academic department within a university.
 
 ```text
 University
@@ -102,23 +126,32 @@ University
             └── Professors
 ```
 
+---
+
 ### Course
 
-A course belongs to a department and can be assigned to multiple professors.
+Represents an academic course offered by a department.
 
 ```text
 Department
     └── Course
+            ├── Enrollments
+            └── ProfessorCourses
 ```
+
+---
 
 ### Professor
 
-A professor belongs to a department and may teach multiple courses.
+Represents a faculty member assigned to a department.
 
 ```text
 Department
     └── Professor
+            └── ProfessorCourses
 ```
+
+---
 
 ### Student
 
@@ -126,11 +159,31 @@ Represents a student enrolled in the institution.
 
 ```text
 Student
+    └── Enrollments
 ```
+
+---
+
+### Enrollment
+
+Represents the enrollment of a student in a course.
+
+```text
+Student
+    └── Enrollment
+            └── Course
+```
+
+Additional information stored:
+
+- EnrollmentDate
+- FinalGrade
+
+---
 
 ### ProfessorCourse
 
-Represents the many-to-many relationship between professors and courses.
+Represents the teaching assignment between professors and courses.
 
 ```text
 Professor
@@ -138,13 +191,13 @@ Professor
             └── Course
 ```
 
-Additional assignment information is stored through the relationship entity:
+Additional information stored:
 
 - Semester
 
 ---
 
-## Database Design
+## Relationship Model
 
 ### One-to-Many Relationships
 
@@ -154,9 +207,38 @@ University 1 ─── N Department
 Department 1 ─── N Course
 
 Department 1 ─── N Professor
+
+Student 1 ─── N Enrollment
+
+Course 1 ─── N Enrollment
+
+Professor 1 ─── N ProfessorCourse
+
+Course 1 ─── N ProfessorCourse
 ```
 
+---
+
 ### Many-to-Many Relationships
+
+#### Student ↔ Course
+
+```text
+Student N ─── N Course
+              │
+              ▼
+          Enrollment
+```
+
+Enrollment uses a composite primary key:
+
+```text
+StudentId + CourseId
+```
+
+---
+
+#### Professor ↔ Course
 
 ```text
 Professor N ─── N Course
@@ -165,7 +247,7 @@ Professor N ─── N Course
          ProfessorCourse
 ```
 
-The `ProfessorCourse` entity uses a composite primary key:
+ProfessorCourse uses a composite primary key:
 
 ```text
 ProfessorId + CourseId
@@ -175,19 +257,21 @@ ProfessorId + CourseId
 
 ## Entity Framework Core
 
-Entity mappings are configured using Fluent API through dedicated configuration classes.
+The project uses Entity Framework Core with Fluent API configurations.
 
-Example responsibilities include:
+Configured features include:
 
 - Primary keys
 - Composite keys
 - Foreign keys
-- Relationships
+- Navigation properties
+- Relationship mappings
 - Delete behaviors
 - Property constraints
 - Indexes
+- Precision configuration
 
-Configuration classes are located in:
+All entity mappings are located in:
 
 ```text
 Configurations/
@@ -205,6 +289,8 @@ GET    /universities/{id}
 POST   /universities
 ```
 
+---
+
 ### Departments
 
 ```http
@@ -212,6 +298,8 @@ GET    /departments
 GET    /departments/{id}
 POST   /departments
 ```
+
+---
 
 ### Courses
 
@@ -221,6 +309,8 @@ GET    /courses/{id}
 POST   /courses
 ```
 
+---
+
 ### Professors
 
 ```http
@@ -228,6 +318,8 @@ GET    /professors
 GET    /professors/{id}
 POST   /professors
 ```
+
+---
 
 ### Students
 
@@ -237,40 +329,28 @@ GET    /students/{id}
 POST   /students
 ```
 
-### Professor Courses
+---
+
+### Enrollments
 
 ```http
-GET    /professor-courses
-GET    /professor-courses/professors/{professorId}/courses/{courseId}
-POST   /professor-courses
+GET    /enrollments
+
+GET    /enrollments/students/{studentId}/courses/{courseId}
+
+POST   /enrollments
 ```
 
 ---
 
-## Running the Application
+### Professor Courses
 
-### Clone the repository
+```http
+GET    /professor-courses
 
-```powershell
-git clone <repository-url>
-```
+GET    /professor-courses/professors/{professorId}/courses/{courseId}
 
-### Restore dependencies
-
-```powershell
-dotnet restore
-```
-
-### Apply migrations
-
-```powershell
-dotnet ef database update
-```
-
-### Run the application
-
-```powershell
-dotnet run
+POST   /professor-courses
 ```
 
 ---
@@ -289,7 +369,7 @@ Apply migrations:
 dotnet ef database update
 ```
 
-Remove last migration:
+Remove the latest migration:
 
 ```powershell
 dotnet ef migrations remove
@@ -297,15 +377,73 @@ dotnet ef migrations remove
 
 ---
 
+## Running the Application
+
+Clone the repository:
+
+```powershell
+git clone <repository-url>
+```
+
+Navigate to the project directory:
+
+```powershell
+cd UniversityManager
+```
+
+Restore dependencies:
+
+```powershell
+dotnet restore
+```
+
+Apply database migrations:
+
+```powershell
+dotnet ef database update
+```
+
+Run the application:
+
+```powershell
+dotnet run
+```
+
+---
+
 ## Design Principles
 
-- Separation of concerns
-- DTO-based API contracts
-- Explicit entity configuration
-- Database-first consistency through migrations
-- RESTful endpoint design
-- Minimal API approach
-- Strong relationship modeling with Entity Framework Core
+- Clean separation of concerns
+- Explicit relationship modeling
+- RESTful API design
+- DTO-based contracts
+- Code First development workflow
+- Fluent API configuration over data annotations
+- Minimal API architecture
+- Strong typing throughout the application
+- Database integrity through foreign keys and constraints
+
+---
+
+## Example Domain Overview
+
+```text
+University
+│
+├── Departments
+│   │
+│   ├── Courses
+│   │   │
+│   │   ├── Enrollments
+│   │   │   └── Students
+│   │   │
+│   │   └── ProfessorCourses
+│   │       └── Professors
+│   │
+│   └── Professors
+│
+└── Students
+```
 
 ---
 
