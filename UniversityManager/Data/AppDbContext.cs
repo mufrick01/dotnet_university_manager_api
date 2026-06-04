@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
     public DbSet<Student> Students => Set<Student>();
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<ProfessorCourse> ProfessorCourses => Set<ProfessorCourse>();
+    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

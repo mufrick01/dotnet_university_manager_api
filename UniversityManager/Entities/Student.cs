@@ -9,4 +9,6 @@ public class Student
 
     public int TutorId { get; set; }
     public Professor Tutor { get; set; } = null!;
+
+    public List<Enrollment> Enrollments { get; set; } = [];
 }

@@ -12,5 +12,8 @@ public class Course
 
     public Department Department { get; set; } = null!;
 
-    public List<ProfessorCourse> ProfessorCourses { get; set; } = null!;
+    public List<ProfessorCourse> ProfessorCourses { get; set; } = [];
+    public List<Enrollment> Enrollments { get; set; } = [];
+
+
 }
