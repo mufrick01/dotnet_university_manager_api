@@ -11,4 +11,6 @@ public class Course
     public int DepartmentId { get; set; }
 
     public Department Department { get; set; } = null!;
+
+    public List<ProfessorCourse> ProfessorCourses { get; set; } = null!;
 }

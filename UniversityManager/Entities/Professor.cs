@@ -7,5 +7,6 @@ public class Professor
     public int DepartmentId { get; set; }
     public Department Department { get; set; } = null!;
     public List<Student> Students { get; set; } = [];
+    public List<ProfessorCourse> ProfessorCourses { get; set; } = [];
 
 }
