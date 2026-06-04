@@ -38,6 +38,7 @@ app.MapUniversityEndpoints();
 app.MapDepartmentEndpoints();
 app.MapProfessorEndpoints();
 app.MapStudentEndpoints();
+app.MapCourseEndpoints();
 
 // ##########################################################
 // ##########################################################

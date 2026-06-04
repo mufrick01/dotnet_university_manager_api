@@ -6,6 +6,7 @@ public class AppDbContext : DbContext
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Professor> Professors => Set<Professor>();
     public DbSet<Student> Students => Set<Student>();
+    public DbSet<Course> Courses => Set<Course>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

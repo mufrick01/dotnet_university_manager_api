@@ -7,6 +7,8 @@ public class Department
     public University University { get; set; } = null!;
 
     public List<Professor> Professors { get; set; } = [];
+    public ICollection<Course> Courses { get; set; }
+    = [];
 
 
 }
