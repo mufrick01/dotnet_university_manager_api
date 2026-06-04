@@ -5,9 +5,11 @@ public class AppDbContext : DbContext
     public DbSet<University> Universities => Set<University>();
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Professor> Professors => Set<Professor>();
+    public DbSet<Student> Students => Set<Student>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

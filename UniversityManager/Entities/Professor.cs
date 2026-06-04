@@ -6,5 +6,6 @@ public class Professor
     public DateTime HireDate { get; set; }
     public int DepartmentId { get; set; }
     public Department Department { get; set; } = null!;
+    public List<Student> Students { get; set; } = [];
 
 }

@@ -6,4 +6,5 @@ public class University
     public DateTime FoundationDate { get; set; }
 
     public List<Department> Departments { get; set; } = [];
+    public List<Student> Students { get; set; } = [];
 }
